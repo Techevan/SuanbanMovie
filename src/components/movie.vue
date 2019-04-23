@@ -4,7 +4,7 @@
             <router-link :to="{path:'/'}" >首页</router-link>
             <router-link :to="{path:'/data'}" >数据统计</router-link>
             <router-link :to="{path:'/about'}" >关于</router-link>
-            <a href="http://www.github.com" >GitHub</a>
+            <a href="https://github.com/Techevan/SuanbanMovie" >GitHub</a>
         </div>
         <div id="header" style="min-width:1040px">
             <div id="headertop">
@@ -29,7 +29,7 @@
                   <router-link  :to="{path:'/'}" ><el-col class="headeritem" :span="2">首页</el-col></router-link>
                   <router-link  :to="{path:'/data'}" ><el-col class="headeritem" :span="2">数据统计</el-col></router-link>
                   <router-link  :to="{path:'/about'}" ><el-col class="headeritem" :span="2">关于作业</el-col></router-link>
-                  <a href="http://www.github.com" ><el-col class="headeritem" :span="2">GitHub</el-col></a>
+                  <a href="https://github.com/Techevan/SuanbanMovie" ><el-col class="headeritem" :span="2">GitHub</el-col></a>
                   <el-col :span="8" style="text-align:left;padding-left:20px;color:#878787">提示：点击下方电影条目查看详情，并提供筛选和搜索服务</el-col>
                 </el-row> 
               </div>

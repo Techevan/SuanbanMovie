@@ -1,21 +1,49 @@
-# webprogramming
+# 蒜瓣电影
 
-> web programming course assignment
+这是Web技术课程作业2的提交文件。您可以通过以下方式体验：
 
-## Build Setup
-
+###### 方法1 在根目录下，运行cmd，使用以下指令
 ``` bash
 # install dependencies
 npm install
 
 # serve with hot reload at localhost:8080
 npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+###### 方法2 访问https://www.techevan.wang
+
+``` bash
+# 敬请注意，这种方式的访问速度较慢，这是由于云服务器的配置所致，并非由于项目原因，在本地使用dev模式或将项目build出的文件运行在本地Apache服务器上不存在类似的卡顿。当点击进入电影详情页面时，由于加载速度较慢会暂时呈现空白，请稍等片刻即可正常显示。
+
+```
+
+###### 关于作业的功能特点
+
+``` bash
+# 您可点击页面中的关于作业链接查看
+```
+
+**1. * JSON解析 ***
+
+*使用JavaScript将其解析，并 将解析后的内容动态生成为html元素，以列表的形式展示在首页*
+
+**2. * 分页功能 ***
+
+*点击首页下方页码切换分页*
+
+**3. * 搜索功能 ***
+
+*支持对电影名、导演、卡司、分类、描述等的搜索*
+
+**4. * 筛选功能 ***
+
+*可根据平均评分和电影分类进行筛选，点击标签删除筛选条件*
+
+**5. * 电影详情页 ***
+
+*点击主页上的电影条目可进入详情页*
+
+**6. * 实现数据统计及可视化 ***
+
+*在数据统计页面以及电影详情页面的评分分布处实现数据可视化*
