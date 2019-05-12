@@ -2,7 +2,11 @@
 
 这是Web技术课程***作业3***的提交文件，相较于作业2的版本，该版本的服务端得以实现（MySQL+php）。您可以通过以下方式体验：
 
+<<<<<<< HEAD
 ###### 方法1 （推荐）访问https://www.techevan.wang
+=======
+###### 方法1 访问https://www.techevan.wang （推荐）
+>>>>>>> e5f4d0a37d5d1bdfbd9729d77fedd4a4d291d63b
 
 ###### 方法2 在根目录下，运行cmd，使用以下指令（请确保PC上已配置Node环境）
 ``` bash
