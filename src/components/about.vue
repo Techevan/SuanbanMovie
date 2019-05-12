@@ -49,7 +49,7 @@
                         <el-steps direction="vertical">
                             <el-step status='process' title="JSON解析" description="使用JavaScript将其解析，并 将解析后的内容动态生成为html元素，以列表的形式展示在首页"></el-step>
                             <el-step status='process' title="分页功能" description="点击下方页码切换分页"></el-step>
-                            <el-step status='process' title="搜索功能" description="支持对电影名、导演、卡司、分类、描述等的搜索"></el-step>
+                            <el-step status='process' title="搜索功能" description="支持对电影名的搜索"></el-step>
                             <el-step status='process' title="筛选功能" description="可根据平均评分和电影分类进行筛选，点击标签删除筛选条件"></el-step>
                             <el-step status='process' title="电影详情页" description="点击主页上的电影条目可进入详情页"></el-step>
                             <el-step status='process' title="实现数据统计及可视化" description="在数据统计页面以及电影详情页面的评分分布处实现数据可视化"></el-step>

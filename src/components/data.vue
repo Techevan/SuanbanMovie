@@ -76,41 +76,50 @@ import axios from 'axios';
 export default {
   name: 'movie',
   created(){
-    axios.get('./static/films.json').then((response)=>{
-      this.movieArray=response.data
-    })
+    
   },
   data () {
     return {
         chartData: {
           columns: ['word', 'count'],
-          rows: getRows(),
+          rows: [],
           shape:'diamond',
         },
-        pieChartData: {
-          columns: ['评分', '数量'],
-          rows: [
-            { '评分': '8-10分', '数量': 41 },
-            { '评分': '6-8分', '数量': 132 },
-            { '评分': '4-6分', '数量': 19 },
-            { '评分': '2-4分', '数量': 0 },
-            { '评分': '0-2分', '数量': 0 }
-          ]
-        },
-        liquidChartData:{
-          columns: ['tag', 'percent'],
-          rows: [{
-            tag: '有评分的电影',
-            percent: 0.96
-          }]
-        }
+        pieChartData: {},
+        liquidChartData:{}
     }
   },
   mounted(){
-    axios.get('./static/films.json').then((response)=>{
-      var fullList=response.data.slice();
-      
+    // 获取词云图所需数据
+    axios.get('https://www.techevan.wang/php/category_count_api.php').then((response)=>{
+      let tempArr=[];
+      for(let item of response.data){
+        tempArr.push({'word':item.genre_name,'count':parseInt(item.num)})
+      }
+      this.chartData.rows= tempArr;
     })
+    
+    // 获取评分分布以及评分总数所需数据
+    axios.get('https://www.techevan.wang/php/get_rate_api.php').then((response)=>{
+      this.pieChartData={
+          columns: ['评分', '数量'],
+          rows: [
+            { '评分': '8-10分', '数量': parseInt(response.data[0]) },
+            { '评分': '6-8分', '数量': parseInt(response.data[1]) },
+            { '评分': '4-6分', '数量': parseInt(response.data[2]) },
+            { '评分': '2-4分', '数量': parseInt(response.data[3]) },
+            { '评分': '0-2分', '数量': parseInt(response.data[4]) }
+          ]
+        };
+        this.liquidChartData={
+          columns: ['tag', 'percent'],
+          rows: [{
+            tag: '有评分的电影',
+            percent: (parseInt(response.data[0])+parseInt(response.data[1])+parseInt(response.data[2])+parseInt(response.data[3])+parseInt(response.data[4]))/parseInt(response.data[5])
+          }]
+        }
+    })
+    
     
   },
   methods:{
@@ -119,91 +128,6 @@ export default {
   }
 }
 
-function getRows () {
-    return [{
-      'word': '剧情',
-      'count': 121
-    }, {
-      'word': '动作',
-      'count': 26
-    }, {
-      'word': '西部',
-      'count': 4
-    }, {
-      'word': '惊悚',
-      'count': 42
-    }, {
-      'word': '犯罪',
-      'count': 28
-    }, {
-      'word': '喜剧',
-      'count': 46
-    }, {
-      'word': '科幻',
-      'count': 15
-    }, {
-      'word': '动画',
-      'count': 12
-    }, {
-      'word': '冒险',
-      'count': 22
-    }, {
-      'word': '爱情',
-      'count': 36
-    }, {
-      'word': '悬疑',
-      'count': 17
-    }, {
-      'word': '恐怖',
-      'count': 15
-    }, {
-      'word': '纪录片',
-      'count': 8
-    }, {
-      'word': '运动',
-      'count': 3
-    }, {
-      'word': '传记',
-      'count': 10
-    }, {
-      'word': '历史',
-      'count': 7
-    }, {
-      'word': '战争',
-      'count': 10
-    }, {
-      'word': '奇幻',
-      'count': 14
-    }, {
-      'word': '同性',
-      'count': 3
-    }, {
-      'word': '音乐',
-      'count': 7
-    }, {
-      'word': '家庭',
-      'count': 9
-    }, {
-      'word': '短片',
-      'count': 7
-    }, {
-      'word': '黑色电影',
-      'count': 2
-    }, {
-      'word': '歌舞',
-      'count': 4
-    }, {
-      'word': '灾难',
-      'count': 1
-    }, {
-      'word': '情色',
-      'count': 1
-    }, {
-      'word': '古装',
-      'count': 1
-    } 
-    ]
-  }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

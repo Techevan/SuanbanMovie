@@ -69,19 +69,11 @@
                         </el-col>
                     </el-row>
                     <el-row style="margin-top:12px;">
-                        <el-col :span="2" style="color:#2587C6;font-weight:bold">国家</el-col>
-                        <el-col :span="20" style="color:#434343">
-                            <span v-for="(countryitem,index) in detail.countries" v-bind:key="index">
-                                <span v-if="index!=0">/</span>
-                                 {{countryitem}} 
-                            </span>
-                        </el-col>
-                    </el-row>
-                    <el-row style="margin-top:12px;">
                         <el-col :span="2" style="color:#2587C6;font-weight:bold">评分</el-col>
                         <el-col :span="20" style="color:#434343">
-                            <span style="color:#FFB11B;font-weight:bold;margin-right:5px">{{detail.rating.average}}</span>
-                            <el-tag size="mini" @click="dialogVisible=true;" v-if="detail.rating.average" class="eltag">点击查看评分分布</el-tag>
+                            <span style="color:#FFB11B;font-weight:bold;margin-right:5px" v-if="detail.average!=='0'">{{detail.average}}</span>
+                            <span v-if="detail.average==='0'">当前尚无用户参与评分</span>
+                            <el-tag size="mini" @click="dialogVisible=true;" v-if="detail.average!=='0'" class="eltag">点击查看评分分布</el-tag>
                         </el-col>
                     </el-row>
                     <el-row style="margin-top:12px;">
@@ -147,9 +139,6 @@ import axios from 'axios';
 export default {
   name: 'movie',
   created(){
-    axios.get('./static/films.json').then((response)=>{
-      this.movieArray=response.data
-    })
     // handleScroll为页面滚动的监听回调
     window.addEventListener('scroll', this.handleScroll);
   },
@@ -166,26 +155,20 @@ export default {
     }
   },
   mounted(){
-    axios.get('./static/films.json').then((response)=>{
-      var fullList=response.data.slice();
-      for(let item of fullList){
-          if(item._id==this.$route.query.id){
-            this.detail=item;
-            if(!this.detail.rating.average){
-                break;
-            }
-            this.chartData= {
-                columns: ['评分', '评分人数'],
-                rows: [
-                    { '评分': '★', '评分人数': this.detail.rating.stars[0] },
-                    { '评分': '★★', '评分人数': this.detail.rating.stars[1] },
-                    { '评分': '★★★', '评分人数': this.detail.rating.stars[2] },
-                    { '评分': '★★★★', '评分人数': this.detail.rating.stars[3] },
-                    { '评分': '★★★★★', '评分人数': this.detail.rating.stars[4] },
-                ]
-            }
-            break;
-          }
+    axios.get('https://www.techevan.wang/php/get_movie_detail_api.php?id='+this.$route.query.id).then((response)=>{
+      this.detail=response.data;
+      if(this.detail.average){
+        let totalTemp=parseInt(this.detail.star5)+parseInt(this.detail.star4)+parseInt(this.detail.star3)+parseInt(this.detail.star2)+parseInt(this.detail.star1);
+        this.chartData= {
+          columns: ['评分', '评分人数'],
+          rows: [
+              { '评分': '★', '评分人数': parseInt(this.detail.star5)/totalTemp },
+              { '评分': '★★', '评分人数': parseInt(this.detail.star4)/totalTemp },
+              { '评分': '★★★', '评分人数': parseInt(this.detail.star3)/totalTemp },
+              { '评分': '★★★★', '评分人数': parseInt(this.detail.star2)/totalTemp },
+              { '评分': '★★★★★', '评分人数': parseInt(this.detail.star1)/totalTemp },
+          ]
+        }
       }
     })
     

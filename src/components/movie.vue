@@ -44,11 +44,11 @@
                     :data="showArray"
                     style="width: 100%">
                     <el-table-column
-                    :label='"共"+movieArray.length+"个结果"'
+                    :label='"共"+totalPage+"个结果"'
                     width="120"
                     prop="poster">
                         <template slot-scope="props">
-                            <img class="poster" :src="getPoster(props.row.poster)" alt='' :onerror="imgerror"/>
+                          <img class="poster" :src="'https://images.weserv.nl/?url='+props.row.poster.substring(7)" alt='' :onerror="imgerror" :onload="imgload(props)"/>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -69,11 +69,11 @@
                         <span>{{props.row.summary}}</span>
                         </div>
                         <div class="rate oneline">
-                        <span v-if='props.row.rating.rating_people'>
+                        <span v-if='props.row.average!=="0"'>
                             <span style="color:#FEAB43"  >★</span>
-                            <span style="color:#FEAB43">{{props.row.rating.average}}</span> (共{{props.row.rating.rating_people}}人参与评分)
+                            <span style="color:#FEAB43">{{props.row.average}}</span> (共{{parseInt(props.row.star1)+parseInt(props.row.star2)+parseInt(props.row.star3)+parseInt(props.row.star4)+parseInt(props.row.star5)}}人参与评分)
                         </span>
-                        <span v-if='!props.row.rating.rating_people'>
+                        <span v-if='props.row.average==="0"'>
                             <span>当前尚无用户参与评分</span>
                         </span>
                         </div>
@@ -86,7 +86,7 @@
                     background
                     layout="prev, pager, next"
                     :current-page='currentPage'
-                    :total="movieArray.length">
+                    :total="totalPage">
                   </el-pagination>
                 </div>
             </el-col>
@@ -123,7 +123,7 @@
                                   closable
                                   :disable-transitions="false"
                                   @close="handleCategoryClose(tag)">
-                                  电影分类：{{form.category}}
+                                  电影分类：{{getCategoryName(form.category)}}
                                 </el-tag>
                               </div>
                             </div>
@@ -154,8 +154,8 @@
                                         <el-option
                                         v-for="(item,index) in categories"
                                         :key="'category'+index"
-                                        :label="item"
-                                        :value="item">
+                                        :label="item.genre_name"
+                                        :value="item.genre_id">
                                         </el-option>
                                     </el-select>
                                 </div>
@@ -171,19 +171,16 @@
 
 <script>
 import axios from 'axios';
-import * as util from '../util/util';
 export default {
   name: 'movie',
   mounted(){
     this.loading=true;
-    axios.get('./static/films.json').then((response)=>{
-      this.fullListArray=response.data.slice();
-      this.movieArray=response.data.slice();
-      this.showArray=response.data.slice((this.currentPage-1)*10,(this.movieArray.length>this.currentPage*10)?this.currentPage*10:this.movieArray.length)
-      setTimeout(() => {
-        this.loading=false;
-      }, 500);
+    this.presearch(this.currentPage)
+    axios.get('https://www.techevan.wang/php/get_category_api.php').then((response)=>{
+      this.categories=response.data;
     })
+
+  
     // handleScroll为页面滚动的监听回调
     window.addEventListener('scroll', this.handleScroll);
   },
@@ -194,25 +191,35 @@ export default {
     return {
       imgerror:`this.src="${require('../assets/fail.png')}"`,
       headerFixed:false,
-      movieArray:[],
       showArray:[],
       fullListArray:[],
       searchbar:'',
       currentPage:1,
+      totalPage:0,
       form:{
           rateRange:0,
           category:'',
           resultTag:[],
       },
       loading:false,
-      categories:['剧情','动作','西部','惊悚','犯罪','喜剧','科幻','动画','冒险','爱情',
-      '悬疑','恐怖','纪录片','运动','传记','历史','战争','奇幻','同性','音乐','家庭','短片','黑色电影','歌舞','灾难','情色','古装'],
+      categories:[],
+      imgloading:[false,false,false,false,false,false,false,false,false,false],
     }
   },
   watch:{
  
   },
   methods:{
+    imgload(props){
+      this.imgloading[props.$index]=false;
+    },
+    getCategoryName(value){
+      for(let item of this.categories){
+        if(value===item.genre_id){
+          return item.genre_name;
+        }
+      }
+    },
     clickRow(rol,col,event){
       this.$router.push({
         path: '/detail',
@@ -223,48 +230,53 @@ export default {
     },
     pageChange(res){
       this.currentPage=res;
-      this.showArray.splice(0,this.showArray.length);
-      this.showArray=this.movieArray.slice((this.currentPage-1)*10,(this.movieArray.length>this.currentPage*10)?this.currentPage*10:this.movieArray.length)
+      this.presearch(res);
+
     },
-    presearch(){
+    presearch(page){
       this.loading=true;
       this.currentPage=1;
-      var tempFullListArray=this.fullListArray.slice();
-      this.movieArray.splice(0,this.movieArray.length);
-      this.movieArray=(util.search((this.form.resultTag[0])?this.form.resultTag[0]:'',this.form.category,this.form.rateRange==0?0:(this.form.rateRange-1)*2,
-      this.form.rateRange==0?0:this.form.rateRange*2,tempFullListArray)).slice();
-      this.showArray.splice(0,this.showArray.length);
-      this.showArray=this.movieArray.slice((this.currentPage-1)*10,(this.movieArray.length>this.currentPage*10)?this.currentPage*10:this.movieArray.length)
-      setTimeout(()=>{
-        this.loading=false
-      },500)
+      this.imgloading=[true,true,true,true,true,true,true,true,true,true];
+      var keywordTemp=(this.form.resultTag[0])?this.form.resultTag[0]:'';
+      var categoryTemp=this.form.category;
+      var minrateTemp=this.form.rateRange==0?0:(this.form.rateRange-1)*2;
+      var maxrateTemp=this.form.rateRange==0?0:this.form.rateRange*2,tempFullListArray;
+      var pageTemp=page;
+      axios.get('https://www.techevan.wang/php/search_movie_api.php',{params: {keyword: keywordTemp,category:categoryTemp,minrate:minrateTemp,maxrate:maxrateTemp,page:pageTemp}}).then((response)=>{
+        this.showArray=response.data.data;
+        this.totalPage=parseInt(response.data.total.substring(1));
+        setTimeout(()=>{
+          this.loading=false
+        },500)        
+      });
+      
     },
     searchbtn(){
       this.form.resultTag.splice(0,1);
       this.form.resultTag.push(this.searchbar);
       this.searchbar='';
-      this.presearch();
+      this.presearch(this.currentPage);
     },
     rateChange(res){
-      this.presearch()
+      this.presearch(this.currentPage)
     },
     categoryChange(res){
-      this.presearch()
+      this.presearch(this.currentPage)
     },
     getPoster:(url)=>{
       return 'https://images.weserv.nl/?url='+url.substring( 7 )
     },
     handleClose(tag) {
       this.form.resultTag.splice(this.form.resultTag.indexOf(tag), 1);
-      this.presearch();
+      this.presearch(this.currentPage);
     },
     handleRateClose(tag){
       this.form.rateRange=0;
-      this.presearch();
+      this.presearch(this.currentPage);
     },
     handleCategoryClose(tag){
       this.form.category='';
-      this.presearch();
+      this.presearch(this.currentPage);
     },
     handleScroll(){
       // 得到页面滚动的距离
